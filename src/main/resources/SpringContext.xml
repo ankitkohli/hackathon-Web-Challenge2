@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd http://www.springframework.org/schema/util
+http://www.springframework.org/schema/util/spring-util-3.0.xsd http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd" >
+
+ 	   <!-- Caching Service configuration -->
+       <bean id="jedisFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+              p:hostName="localhost"
+              p:port="6379"
+              p:timeout ="200000"
+              p:poolConfig-ref="customJedisPoolConfig"
+              p:use-pool="true"
+              />
+              
+		<bean id="jedisFactoryOther" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+              p:hostName="localhost"
+              p:port="6379"
+              p:timeout ="200000"
+              p:poolConfig-ref="customJedisPoolConfig"
+              p:use-pool="true"
+   			  />
+       <bean id="customJedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig"
+              p:maxActive = "100"
+              p:maxIdle = "15"
+              p:minIdle = "10"
+              p:timeBetweenEvictionRunsMillis = "360000"
+              p:testOnBorrow = "true"
+              p:testOnReturn = "true"
+              p:testWhileIdle = "true" />
+
+       <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate"
+              p:connection-factory-ref="jedisFactory">
+              <property name="keySerializer">
+                     <bean
+                           class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+              </property>
+       </bean>
+       
+ 		
+
+       <bean id="cacheService" class="com.hackathon.mobileapp.cacheManager.CacheManagerServiceImpl"
+              p:_cacheTemplate-ref="redisTemplate"/>
+              
+      
+</beans>
